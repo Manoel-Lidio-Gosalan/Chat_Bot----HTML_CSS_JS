@@ -7,26 +7,25 @@ site : cdnjs.com
 pip install python-socketio flask-socketio simple-websocket
 
 """
-
-from flask import render_template, app, Flask
+from flask import render_template, Flask
 from flask_socketio import SocketIO, send
 
+app = Flask(__name__, template_folder='templates')
 
-app = Flask(__name__)
+
 
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# funcionalidade de enviar mensagens
-
+# Funcionalidade de enviar mensagens
 @socketio.on('message')
 def gerenciar_mensagem(mensagem):
-    """função que gerencia as mensagens enviadas pelo usuário"""
+    """Função que gerencia as mensagens enviadas pelo usuário"""
     send(mensagem, broadcast=True)
 
 @app.route('/')
-
 def home():
-    """função que renderiza a página inicial"""
+    """Função que renderiza a página inicial"""
     return render_template('home.html')
 
-socketio.run(app, host='localhost', debug=True)
+if __name__ == '__main__':
+    socketio.run(app, host='localhost', debug=True)
