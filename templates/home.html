@@ -1,35 +1,132 @@
-<!--  site scripts  
-http://cdnjs.com
-  -->
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.1/socket.io.js" integrity="sha512-Z6C1p1NIexPj5MsVUunW4pg7uMX6/TT3CUVldmjXx2kpip1eZcrAnxIusDxyFIikyM9A61zOVNgvLr/TGudOQg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat Bot</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-    </head>
-    <body>
-    <h1>Chat ao vivo</h1>
-    <div id="mensagens">
-       <p>Manoel: olá</p>
-       <p>lidio: salve</p>
-       <p>gosalan: coe</p>
-       <p>santos: de boas</p>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #top-bar {
+            background-image: url("../image/595000.jpg");
+            background-size: cover;
+            background-repeat: no-repeat;
+            color: #FFF;
+            padding: 10px;
+            text-align: center;
+        }
+
+        #chat-container {
+            background-image: url("../image/595000.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            padding: 10px;
+            height: calc(100vh - 150px);
+            overflow-y: scroll;
+        }
+
+        #chat-container p {
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        #input-container {
+            display: flex;
+            align-items: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: rgb(66, 4, 78);
+            padding: 10px;
+            box-shadow: 0 -2px 5px rgba(129, 7, 153, 0.363);
+        }
+
+        #input-container input[type="text"] {
+          color: #fff;
+            padding: 10px;
+            border: none;
+            outline: none;
+            flex: 1;
+        }
+
+        #input-container input#usuario {
+            background-color: rgb(28, 1, 34);
+            margin-right: 10px;
+            width: 30%;
+        }
+
+        #input-container input#mensagem {
+            background-color: rgb(28, 1, 34);
+            flex: 1;
+        }
+
+        #input-container button {
+            padding: 10px 20px;
+            background-color: rgb(129, 7, 153);
+            color: #FFF;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.1/socket.io.js" integrity="sha512-Z6C1p1NIexPj5MsVUunW4pg7uMX6/TT3CUVldmjXx2kpip1eZcrAnxIusDxyFIikyM9A61zOVNgvLr/TGudOQg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <div id="top-bar">
+        <h1>Chat Bot</h1>
     </div>
-    
-    <input type="text" id="usuario" placeholder="Usuario" />
-    <input type="text" id="mensagem" placeholder="Digite sua mensagem" />
-    <button id="btn_enviar">Enviar</button>
 
-    <!--script em js-->
-    <script type="text/javascript" >
+    <div id="chat-container">
+        <p>Bem vindo ao chat Aberto!</p>
+    </div>
 
+    <div id="input-container">
+        <input type="text" id="usuario" placeholder="Usuario" required>
+        <div style="width: 10px;"></div>
+        <input type="text" id="mensagem" placeholder="Mensagem" required>
+        <button id="botao">Enviar</button>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var socket = io("localhost:5000")
+            socket.on("connect", function() {
+                console.log("conectou");
+            });
+
+            socket.on("message", function(data) {
+                console.log("enviou mensagem");
+                $("#chat-container").append($('<p>').text(data));
+                // Scroll to the bottom of the chat container
+                $("#chat-container").scrollTop($("#chat-container")[0].scrollHeight);
+            });
+
+            $("#botao").on('click', function() {
+                console.log("clicou botao");
+                socket.send($('#usuario').val() + ": " + $('#mensagem').val());
+                $('#mensagem').val('');
+            });
+            $("#mensagem").on('keypress', function() {
+                if (event.key === "Enter") {
+                    console.log("deu enter");
+                    socket.send($('#usuario').val() + ": " + $('#mensagem').val());
+                    $('#mensagem').val('');
+                }
+            });
+        });
     </script>
-
-
 </body>
 </html>
